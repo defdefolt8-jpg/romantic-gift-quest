@@ -39,15 +39,15 @@
     <div class="footer-note">Демо создано для показа услуги персональных игр-подарков</div>
   </main>
   <script>
-    const $=s=>document.querySelector(s);const screens=["intro","game","between","finish"];let soundOn=true,level=1,score=0,raf=0,playing=false,passed=0;
+    const $=s=>document.querySelector(s);const screens=["intro","game","between","finish"];let soundOn=true,level=1,score=0,raf=0,playing=false,started=false,passed=0;
     const canvas=$("#canvas"),ctx=canvas.getContext("2d"),W=canvas.width,H=canvas.height;let bird,pipes,last=0;
     function show(id){screens.forEach(x=>$("#"+x).classList.toggle("active",x===id))}
     function beep(freq=520,duration=.06){if(!soundOn)return;try{const a=new(window.AudioContext||window.webkitAudioContext)(),o=a.createOscillator(),g=a.createGain();o.frequency.value=freq;o.type="sine";g.gain.setValueAtTime(.045,a.currentTime);g.gain.exponentialRampToValueAtTime(.001,a.currentTime+duration);o.connect(g);g.connect(a.destination);o.start();o.stop(a.currentTime+duration)}catch(e){}}
     function heart(x,y,s){ctx.save();ctx.translate(x,y);ctx.scale(s,s);ctx.beginPath();ctx.moveTo(0,13);ctx.bezierCurveTo(-35,-9,-19,-28,0,-12);ctx.bezierCurveTo(19,-28,35,-9,0,13);ctx.fillStyle="#ed4f83";ctx.fill();ctx.restore()}
-    function resetGame(){cancelAnimationFrame(raf);score=0;passed=0;playing=true;bird={x:130,y:180,vy:0,r:15};pipes=[];for(let i=0;i<3;i++)addPipe(360+i*230);$("#scoreLabel").textContent="0 / "+target();last=performance.now();raf=requestAnimationFrame(loop)}
+    function resetGame(){cancelAnimationFrame(raf);score=0;passed=0;playing=false;started=false;bird={x:130,y:180,vy:0,r:15};pipes=[];for(let i=0;i<3;i++)addPipe(360+i*230);$("#scoreLabel").textContent="0 / "+target();draw()}
     function target(){return level===1?3:level===2?4:5}function gap(){return level===1?145:level===2?125:108}function speed(){return level===1?2.7:level===2?3.4:4.1}
     function addPipe(x){const g=gap(),top=48+Math.random()*(H-100-g);pipes.push({x,top,gap:g,w:64,hit:false})}
-    function jump(){if(!playing)return;bird.vy=-6.6;beep(680,.05)}
+    function jump(){if(!started){started=true;playing=true;last=performance.now();raf=requestAnimationFrame(loop)}if(!playing)return;bird.vy=-6.6;beep(680,.05)}
     function collide(p){const bx=bird.x,by=bird.y,r=bird.r;if(bx+r>p.x&&bx-r<p.x+p.w&&(by-r<p.top||by+r>p.top+p.gap))return true;if(by-r<0||by+r>H)return true;return false}
     function loop(t){const dt=Math.min(2,(t-last)/16.7);last=t;if(playing){bird.vy+=.34*dt;bird.y+=bird.vy*dt;pipes.forEach(p=>{p.x-=speed()*dt;if(!p.hit&&p.x+p.w<bird.x){p.hit=true;passed++;score=Math.min(target(),passed);$("#scoreLabel").textContent=score+" / "+target();beep(820,.06);if(score>=target()){playing=false;setTimeout(levelDone,180)}}});if(pipes[pipes.length-1].x<300)addPipe(pipes[pipes.length-1].x+230);pipes=pipes.filter(p=>p.x>-90);if(pipes.some(collide)){playing=false;beep(180,.16);draw();setTimeout(()=>{if(confirm("Сердечко задело препятствие. Начать уровень заново?"))resetGame()},80)}}draw();if(playing)raf=requestAnimationFrame(loop)}
     function draw(){ctx.clearRect(0,0,W,H);ctx.fillStyle="#fff7fa";ctx.fillRect(0,0,W,H);ctx.fillStyle="#fde2eb";for(let i=0;i<18;i++){ctx.beginPath();ctx.arc((i*83+30)%W,35+(i*47)%H,2,0,Math.PI*2);ctx.fill()}pipes.forEach(p=>{ctx.fillStyle="#f6a5bd";ctx.fillRect(p.x,0,p.w,p.top);ctx.fillRect(p.x,p.top+p.gap,p.w,H-(p.top+p.gap));ctx.fillStyle="#ed4f83";ctx.fillRect(p.x-4,p.top-10,p.w+8,10);ctx.fillRect(p.x-4,p.top+p.gap,p.w+8,10)});heart(bird?.x||130,bird?.y||180,1);}
