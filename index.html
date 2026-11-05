@@ -1,122 +1,290 @@
 <!doctype html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Тайна для тебя</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Сюрприз — романтический квест</title>
 <style>
-:root{--ink:#241b38;--muted:#766c86;--pink:#ff6e9b;--lav:#b99cff;--cream:#fff8f2;--card:#ffffffd9}
-*{box-sizing:border-box}
-body{margin:0;min-height:100vh;font-family:Inter,ui-sans-serif,system-ui,-apple-system,sans-serif;color:var(--ink);background:radial-gradient(circle at 15% 10%,#ffd9e6 0 18%,transparent 38%),radial-gradient(circle at 85% 80%,#dcd2ff 0 15%,transparent 38%),linear-gradient(135deg,#fff8f2,#f6efff);display:grid;place-items:center;padding:20px}
-.shell{width:min(720px,100%)}
-.brand{font-size:13px;letter-spacing:.15em;text-transform:uppercase;color:#9a7790;margin:0 0 14px 8px}
-.card{background:var(--card);backdrop-filter:blur(18px);border:1px solid #ffffff;border-radius:28px;padding:clamp(26px,6vw,56px);box-shadow:0 24px 80px #73567b20;min-height:510px;display:flex;flex-direction:column;justify-content:center;position:relative;overflow:hidden}
-.orb{position:absolute;width:170px;height:170px;border-radius:50%;background:#ffb1cb55;right:-60px;top:-70px}
-.step{display:none;animation:up .45s ease}.step.active{display:block}
-@keyframes up{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
-.eyebrow{color:var(--pink);font-weight:700;font-size:14px;margin-bottom:18px}
-.game{position:relative;margin:18px 0}.game canvas{width:100%;height:auto;display:block;border-radius:18px;background:linear-gradient(180deg,#ffe8f1,#eee7ff);border:1px solid #fff}
-.score{position:absolute;top:12px;right:14px;background:#ffffffc9;border-radius:999px;padding:6px 11px;font-weight:800;font-size:14px}
-.gameover{position:absolute;inset:0;display:grid;place-items:center;color:var(--ink);font-weight:800;background:#ffffffaa;border-radius:18px}
-h1{font-size:clamp(36px,8vw,68px);line-height:.98;letter-spacing:-.055em;margin:0 0 20px;max-width:580px}
-h2{font-size:clamp(27px,5vw,42px);line-height:1.05;letter-spacing:-.04em;margin:0 0 16px}
-p{font-size:18px;line-height:1.6;color:var(--muted);max-width:560px;margin:0 0 26px}
-.hint{font-size:15px;color:#9a8fa3;margin-top:18px}
-.buttons{display:flex;gap:12px;flex-wrap:wrap}
-.btn{border:0;border-radius:999px;padding:15px 22px;font-size:16px;font-weight:750;cursor:pointer;background:var(--ink);color:#fff;transition:.2s}
-.btn:hover{transform:translateY(-2px);box-shadow:0 8px 20px #241b3830}.btn.secondary{background:#fff;color:var(--ink);border:1px solid #eadff0}
-.progress{position:absolute;left:28px;right:28px;bottom:18px;height:5px;background:#eee5f0;border-radius:10px;overflow:hidden}
-.bar{height:100%;background:linear-gradient(90deg,var(--pink),var(--lav));width:25%;transition:.3s}
-.choices{display:grid;gap:10px;margin:20px 0}
-.choice{background:#fff;border:1px solid #eadff0;border-radius:16px;padding:15px;text-align:left;font-size:16px;cursor:pointer;color:var(--ink)}
-.choice:hover{border-color:var(--pink);background:#fff8fb}.lock{font-size:52px;margin-bottom:12px}
-.final{background:linear-gradient(135deg,#fff,#fff2f7);border-radius:20px;padding:22px;margin:20px 0}
-.signature{font-family:Georgia,serif;font-size:28px;color:var(--pink)}small{color:#a89caf}
-</style>
-</head>
-<body>
-<main class="shell">
-<div class="brand">демо · персональный сюрприз</div>
-<section class="card">
-<div class="orb"></div>
-<div class="step active" data-step="0">
-<div class="eyebrow">ТЕБЕ ОСТАВИЛИ СООБЩЕНИЕ</div>
-<h1>Тайна, которую стоит найти</h1>
-<p>Сегодня обычный подарок превратится в маленькое приключение. Отвечай на вопросы, вспоминай важное — и двигайся дальше.</p>
-<div class="buttons"><button class="btn" onclick="next()">Начать поиск →</button></div>
-<div class="hint">Это демонстрационная версия. В персональной игре здесь будут ваши имена, фото и шутки.</div>
-</div>
-<div class="step" data-step="1">
-<div class="eyebrow">ШАГ 1 · ВОСПОМИНАНИЕ</div>
-<h2>Где началась ваша самая смешная история?</h2>
-<div class="choices">
-<button class="choice" onclick="next()">На прогулке под дождём</button>
-<button class="choice" onclick="next()">В переписке до рассвета</button>
-<button class="choice" onclick="next()">В месте, о котором знаете только вы</button>
-</div>
-</div>
-<div class="step" data-step="2">
-<div class="eyebrow">ШАГ 2 · ПОЙМАЙ СЕРДЦЕ</div>
-<h2>Проведи сердце через облака любви</h2>
-<p>Нажимай на экран или пробел, чтобы лететь. Набери 5 очков — и получишь следующую подсказку.</p>
-<div class="game">
-<canvas id="game" width="560" height="260"></canvas>
-<div class="score" id="score">0 / 5</div>
-</div>
-<div class="buttons">
-<button class="btn" id="startGame" onclick="startGame()">Начать игру →</button>
-<button class="btn secondary" id="continue" onclick="next()" style="display:none">Открыть подсказку</button>
-</div>
-</div>
-<div class="step" data-step="3">
-<div class="eyebrow">ФИНАЛ · ОТКРОЙ КОНВЕРТ</div>
-<div class="lock">💌</div>
-<h2>Твой подарок — там, где хранятся самые тёплые слова.</h2>
-<div class="final">
-<p style="margin-bottom:8px">Спасибо, что ты есть. Это только маленькая игра, а настоящее приключение я хочу пройти рядом с тобой.</p>
-<div class="signature">Твой человек</div>
-</div>
-<small>Так выглядит демо. Для заказа создаётся отдельная версия с вашей историей.</small>
-</div>
-<div class="progress"><div class="bar" id="bar" style="width:25%"></div></div>
-</section>
-</main>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap');
+:root{--pink:#ff5f99;--pink-dark:#d93672;--pink-soft:#fff0f6;--pink-pale:#fff8fb;--ink:#321927;--muted:#8b6678;--line:#f2c9d8;--white:#fff}
+*{box-sizing:border-box}html{scroll-behavior:auto}body{margin:0;min-height:100vh;background:var(--pink-pale);color:var(--ink);font-family:'DM Sans',sans-serif;overflow-x:hidden}.glow{display:none}.wrap{max-width:900px;margin:0 auto;padding:34px 18px 56px}.top{display:flex;align-items:center;justify-content:space-between;margin-bottom:26px}.brand{display:flex;gap:10px;align-items:center;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--pink-dark);font-weight:800}.brand span{display:grid;place-items:center;width:34px;height:34px;border-radius:10px;background:var(--pink);color:var(--white);font-size:18px}.badge{border:1px solid var(--line);padding:7px 11px;border-radius:999px;color:var(--pink-dark);font-size:12px;background:var(--white);font-weight:700}.shell{border:2px solid var(--line);background:var(--white);border-radius:26px;box-shadow:0 4px 0 #f7dce6,0 18px 42px rgba(217,54,114,.13);overflow:hidden}.hero{padding:64px clamp(22px,6vw,68px) 48px}.eyebrow{color:var(--pink-dark);font-size:12px;letter-spacing:.16em;text-transform:uppercase;font-weight:800}.hero h1{font-size:clamp(42px,7vw,72px);line-height:1;letter-spacing:-.05em;margin:22px 0 20px;max-width:680px;font-weight:800}.hero h1 em{font-style:normal;color:var(--pink)}.hero p{max-width:560px;color:var(--muted);font-size:17px;line-height:1.55;margin:0}.start-row{display:flex;gap:16px;align-items:center;margin-top:34px;flex-wrap:wrap}.primary,.ghost{font:inherit;cursor:pointer;border-radius:12px;padding:13px 18px;font-weight:800}.primary{background:var(--pink);color:var(--white);border:2px solid var(--pink-dark);box-shadow:none}.primary:hover{background:var(--pink-dark)}.ghost{background:var(--white);color:var(--pink-dark);border:2px solid var(--line)}.ghost:hover{border-color:var(--pink);color:var(--pink-dark)}.hint{color:var(--muted);font-size:13px}.progress{height:6px;background:var(--pink-soft)}.progress i{display:block;height:100%;width:0;background:var(--pink)}.stage{display:none;padding:44px clamp(22px,6vw,68px) 68px}.stage.active{display:block}.stage-title{display:flex;justify-content:space-between;align-items:start;gap:28px}.stage h2{font-size:clamp(32px,5vw,52px);line-height:1.02;letter-spacing:-.04em;margin:0 0 10px;font-weight:800}.stage .sub{color:var(--muted);line-height:1.55;margin:0 0 30px;max-width:620px}.mini-card{border:2px solid var(--line);background:var(--pink-pale);border-radius:20px;padding:22px;box-shadow:0 4px 0 #f7dce6,0 14px 28px rgba(217,54,114,.1)}.game{height:360px;position:relative;overflow:hidden;border-radius:16px;background:var(--pink-soft);border:2px solid var(--pink);box-shadow:inset 0 0 0 6px var(--white),0 4px 0 #edb9cd,0 14px 24px rgba(217,54,114,.12);touch-action:none;user-select:none;isolation:isolate}.game:before{content:'';position:absolute;inset:16px;border:1px dashed #f5b8cc;border-radius:10px;pointer-events:none}.pipe{position:absolute;width:46px;border:2px solid var(--pink-dark);background:var(--pink);border-radius:10px;box-shadow:0 3px 0 var(--pink-dark);z-index:1}.pipe.top{top:0}.pipe.bottom{bottom:0}.level-label{position:absolute;left:18px;top:18px;z-index:3;color:var(--pink-dark);font-size:11px;letter-spacing:.08em;text-transform:uppercase;font-weight:800;background:var(--white);padding:7px 10px;border:2px solid var(--line);border-radius:999px;box-shadow:0 3px 0 #f0d2dd}.score{position:absolute;right:58px;top:14px;z-index:3;color:var(--pink-dark);font-weight:800;font-size:13px;background:var(--white);padding:7px 11px;border-radius:999px;border:2px solid var(--line);box-shadow:0 3px 0 #f0d2dd}.lane{position:absolute;inset:0}.player{position:absolute;width:48px;height:48px;border-radius:50%;display:grid;place-items:center;font-size:29px;filter:none;left:clamp(26px,12%,92px);top:180px;z-index:2;will-change:transform;animation:heartFloat 1.35s ease-in-out infinite}.game.playing .game-copy{color:var(--pink-dark)}.game.hit{animation:hitShake .34s ease both}.game.success{animation:successPulse .45s ease both}.sound-toggle{position:absolute;right:16px;top:14px;z-index:4;border:2px solid var(--line);background:var(--white);color:var(--pink-dark);border-radius:999px;width:34px;height:34px;cursor:pointer;font-size:16px;box-shadow:0 3px 0 #f0d2dd}.spark{position:absolute;z-index:4;pointer-events:none;color:var(--pink-dark);font-size:17px;animation:sparkBurst .65s ease-out forwards}.game-status{position:absolute;inset:0;z-index:5;display:grid;place-items:center;align-content:center;gap:10px;text-align:center;background:rgba(255,255,255,.96);padding:32px;box-shadow:inset 0 0 0 8px #fff0f6}.game-status[hidden]{display:none}.game-status strong{font-size:24px;color:var(--pink-dark)}.game-status span{color:var(--muted);font-size:14px}.game-status button{margin-top:8px}.score-pop{animation:scorePop .25s ease both}.game-copy{position:absolute;left:20px;bottom:16px;color:var(--pink-dark);font-size:12px;z-index:4;font-weight:700;background:rgba(255,255,255,.94);border:1px solid var(--line);border-radius:8px;padding:6px 9px;box-shadow:0 2px 0 #f0d2dd}.game-btn{margin-top:18px;width:100%}.personal-card{margin-top:26px;padding:20px;border:2px solid var(--line);border-radius:16px;background:var(--pink-pale);box-shadow:0 3px 0 #f1d6df}.field-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}.field-label{display:grid;gap:8px;color:var(--pink-dark);font-size:12px;font-weight:800}.text-input{width:100%;padding:12px 13px;border:2px solid var(--line);border-radius:10px;background:var(--white);color:var(--ink);font:inherit;font-size:14px;outline:none}.text-input:focus{border-color:var(--pink)}.field-note{margin-top:12px;color:var(--muted);font-size:12px}.choices{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-top:28px}.choice{padding:22px;border-radius:16px;text-align:left;background:var(--white);border:2px solid var(--line);color:var(--ink);cursor:pointer;font:inherit;font-weight:700;box-shadow:0 3px 0 #f1d6df}.choice:hover{border-color:var(--pink);color:var(--pink-dark)}.choice small{display:block;color:var(--muted);font-size:12px;margin-top:5px;font-weight:500}.note{display:flex;gap:14px;align-items:flex-start;padding:20px;border-radius:16px;background:var(--pink-soft);border:2px solid var(--line);margin-top:24px;box-shadow:0 3px 0 #f1d6df}.note .heart{font-size:25px}.final{display:grid;grid-template-columns:1.1fr .9fr;gap:24px;align-items:stretch}.letter{padding:32px;border-radius:20px;background:var(--pink-soft);border:2px solid var(--line);color:var(--ink);min-height:250px;position:relative;overflow:hidden;box-shadow:0 4px 0 #f1d6df}.letter:after{content:'♥';position:absolute;right:-18px;bottom:-30px;font-size:180px;color:#ff9ab833;transform:rotate(-18deg)}.letter h3{font-size:30px;margin:0 0 14px;font-weight:800}.letter p{line-height:1.6;max-width:390px;position:relative;z-index:1}.reveal{border:2px solid var(--line);border-radius:20px;padding:28px;background:var(--white);display:flex;flex-direction:column;justify-content:space-between;box-shadow:0 4px 0 #f1d6df}.reveal .big{font-size:62px}.reveal p{color:var(--muted);line-height:1.5}.foot{padding:0 6px;color:var(--muted);text-align:center;font-size:12px;margin-top:26px}@keyframes heartFloat{50%{transform:translateY(-4px) rotate(-4deg)}}@keyframes sparkBurst{from{opacity:1;transform:translate(-50%,-20%) scale(.7)}to{opacity:0;transform:translate(-50%,-70px) scale(1.3)}}@keyframes hitShake{20%{transform:translateX(-5px)}45%{transform:translateX(5px)}70%{transform:translateX(-3px)}}@keyframes successPulse{50%{box-shadow:0 0 0 8px #ff9ab833}}@keyframes scorePop{50%{transform:scale(1.12)}}@media(max-width:650px){.wrap{padding:22px 12px 36px}.hero{padding:44px 20px 34px}.stage{padding:34px 20px 48px}.top{margin-bottom:20px}.choices,.final{grid-template-columns:1fr}.field-grid{grid-template-columns:1fr}.badge{display:none}.game{height:min(58vh,380px);min-height:320px}.pipe{width:44px}.player{width:46px;height:46px;font-size:28px}}
+</style></head>
+<body><div class="glow"></div><main class="wrap"><div class="top"><div class="brand"><span>♡</span> маленький сюрприз</div><div class="badge">демо · 3 шага</div></div><section class="shell"><div class="hero" id="hero"><div class="eyebrow">персональная игра для двоих</div><h1>Подарок начинается <em>до</em> подарка.</h1><p>Небольшое приключение с вашими шутками, воспоминаниями и финальной подсказкой. Нажми «начать», чтобы посмотреть, как это ощущается.</p><div class="start-row"><button class="primary" id="start">Начать историю&nbsp; →</button><span class="hint">Открывается на телефоне · без установки</span></div></div><div class="progress"><i id="bar"></i></div><section class="stage" id="stage1"><div class="stage-title"><div><div class="eyebrow">глава 01 · полёт</div><h2>Пройди три<br>уровня</h2><p class="sub">Собирай сердца и проходи пролёты. Каждый уровень становится чуть быстрее.</p></div><div class="badge">1 / 3</div></div><div class="mini-card"><div class="game" id="game"><div class="lane"><div class="player" id="player">💗</div><div class="pipe top" style="left:45%;height:88px"></div><div class="pipe bottom" style="left:45%;height:68px"></div><div class="pipe top" style="left:72%;height:120px"></div><div class="pipe bottom" style="left:72%;height:70px"></div><div class="pipe top" style="left:100%;height:76px"></div><div class="pipe bottom" style="left:100%;height:100px"></div><div class="level-label" id="levelLabel">уровень 1 · легко</div><div class="score" id="score">0 / 3</div><button class="sound-toggle" id="soundToggle" type="button" aria-label="Выключить звук">🔊</button></div><div class="game-status" id="gameStatus" hidden><strong id="statusTitle">💥 Ой, задела!</strong><span id="statusText">Столкновение засчитано. Попробуй ещё раз.</span><button class="ghost" id="statusAction">Повторить игру</button></div><div class="game-copy">Тапай по полю — поднимай сердечко между трубами</div></div><button class="primary game-btn" id="play">Начать уровень</button></div></section><section class="stage" id="stage2"><div class="stage-title"><div><div class="eyebrow">глава 02 · память</div><h2>Настрой<br>финал</h2><p class="sub">Добавь пару деталей, чтобы последняя подсказка стала вашей.</p></div><div class="badge">2 / 3</div></div><div class="personal-card"><div class="field-grid"><label class="field-label">Имя получателя<input class="text-input" id="recipientName" maxlength="24" placeholder="Например, Аня" /></label><label class="field-label">Где спрятать подарок?<input class="text-input" id="giftPlace" maxlength="40" placeholder="Например, на кухне" /></label></div><div class="field-note">Поля можно оставить пустыми — тогда останутся демо-значения.</div></div><div class="choices"><button class="choice" data-good="1">Ваша любимая кофейня<small>где разговоры всегда дольше кофе</small></button><button class="choice" data-good="1">Место первой встречи<small>откуда всё по-настоящему началось</small></button><button class="choice">Ваша кухня дома<small>где рождаются лучшие вечера</small></button><button class="choice">Ваш тайный уголок<small>куда хочется возвращаться вдвоём</small></button></div></section><section class="stage" id="stage3"><div class="eyebrow">глава 03 · найдено</div><h2>Подарок<br>найден</h2><p class="sub">Последняя подсказка уже собрана. Осталось только открыть её в нужный момент.</p><div class="note"><div class="heart">💌</div><div><strong><span id="recipientOut">Для тебя</span>, подарок ждёт рядом с <span id="placeOut">вашим местом</span></strong><br><span style="color:var(--muted)">Подсказка ведёт к месту: <span id="giftPlaceOut">выбранная локация</span>.</span></div></div><div class="final" style="margin-top:28px"><div class="letter"><h3 id="letterTitle">Для тебя</h3><p>Я хотел(а), чтобы обычный подарок превратился в маленькое приключение. Теперь осталось найти его рядом с <span id="letterPlace">вашим местом</span>.</p></div><div class="reveal"><div><div class="big">🎁</div><h3>Финал готов</h3><p>Три уровня пройдены, место выбрано, подсказка собрана.</p></div><button class="primary" id="restart">Пройти ещё раз</button></div></div></section></section><div class="foot">Это демонстрация формата · персональная версия собирается под вашу пару</div></main>
 <script>
-let i=0;let gameRunning=false,gameTimer;
-function next(){document.querySelector(`[data-step="${i}"]`).classList.remove('active');i=Math.min(3,i+1);document.querySelector(`[data-step="${i}"]`).classList.add('active');document.getElementById('bar').style.width=((i+1)/4*100)+'%'}
-const canvas=document.getElementById('game'),ctx=canvas.getContext('2d');
-let bird,blocks,score,frame;
-function drawGame(){
-ctx.clearRect(0,0,canvas.width,canvas.height);
-ctx.fillStyle='#ffffff55';
-for(let x=0;x<canvas.width;x+=42){ctx.beginPath();ctx.arc(x+10,28+(x%3)*18,2,0,7);ctx.fill()}
-ctx.font='28px serif';ctx.fillText('♥',bird?.x||84,bird?.y||120);
-ctx.fillStyle='#b99cff';(blocks||[]).forEach(b=>{ctx.fillRect(b.x,0,42,b.top);ctx.fillRect(b.x,b.top+92,42,canvas.height)});
-ctx.fillStyle='#ff6e9b';ctx.font='700 14px system-ui';ctx.fillText('Лети к подарку',18,canvas.height-16)
+const hero = document.getElementById('hero');
+const bar = document.getElementById('bar');
+const stage1 = document.getElementById('stage1');
+const stage2 = document.getElementById('stage2');
+const stage3 = document.getElementById('stage3');
+const player = document.getElementById('player');
+const game = document.getElementById('game');
+const playButton = document.getElementById('play');
+const scoreLabel = document.getElementById('score');
+const levelLabel = document.getElementById('levelLabel');
+const status = document.getElementById('gameStatus');
+const statusTitle = document.getElementById('statusTitle');
+const statusText = document.getElementById('statusText');
+const statusAction = document.getElementById('statusAction');
+const soundToggle = document.getElementById('soundToggle');
+const recipientName = document.getElementById('recipientName');
+const giftPlace = document.getElementById('giftPlace');
+const pipes = [...document.querySelectorAll('.pipe')];
+const pipePairs = [[pipes[0], pipes[1]], [pipes[2], pipes[3]], [pipes[4], pipes[5]]];
+const levelConfigs = [
+  { label: 'уровень 1 · легко', speed: 2.7, gravity: 0.34, flap: -7.6, gaps: [[88, 68], [120, 70], [76, 100]] },
+  { label: 'уровень 2 · быстрее', speed: 3.35, gravity: 0.36, flap: -7.6, gaps: [[112, 72], [138, 74], [98, 110]] },
+  { label: 'уровень 3 · финал', speed: 4.05, gravity: 0.38, flap: -7.8, gaps: [[126, 76], [150, 78], [112, 118]] }
+];
+
+let currentLevel = 0;
+let playerY = 0;
+let velocity = 0;
+let running = false;
+let score = 0;
+let passed = new Set();
+let animationFrame = 0;
+let audioContext = null;
+let soundEnabled = true;
+
+function show(stage) {
+  document.querySelectorAll('.stage').forEach((item, index) => item.classList.toggle('active', index === stage - 1));
+  hero.style.display = stage ? 'none' : 'block';
+  bar.style.width = stage ? `${(stage / 3) * 100}%` : '0%';
 }
-function endGame(win=false){
-gameRunning=false;clearInterval(gameTimer);cancelAnimationFrame(frame);
-if(win){document.getElementById('continue').style.display='inline-block';document.getElementById('startGame').style.display='none'}
-else document.getElementById('startGame').textContent='Попробовать снова →'
+
+function clamp(value, min, max) {
+  return Math.max(min, Math.min(max, value));
 }
-function tick(){
-if(!gameRunning)return;bird.v+=.34;bird.y+=bird.v;blocks.forEach(b=>b.x-=2.5);
-if(blocks.length&&blocks[0].x<-50){blocks.shift();score++;document.getElementById('score').textContent=score+' / 5';if(score>=5){endGame(true);return}}
-if(!blocks.length||blocks[blocks.length-1].x<310)blocks.push({x:canvas.width,top:45+Math.random()*105});
-for(const b of blocks){if(bird.x+24>b.x&&bird.x<b.x+42&&(bird.y-20<b.top||bird.y+5>b.top+92)){endGame();return}}
-if(bird.y<0||bird.y>canvas.height-4){endGame();return}
-drawGame();frame=requestAnimationFrame(tick)
+
+function ensureAudio() {
+  if (!audioContext) {
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContextClass) return;
+    audioContext = new AudioContextClass();
+  }
+  if (audioContext.state === 'suspended') audioContext.resume();
 }
-function flap(){if(gameRunning)bird.v=-6}
-function startGame(){
-bird={x:84,y:120,v:0};blocks=[];score=0;gameRunning=true;
-document.getElementById('score').textContent='0 / 5';document.getElementById('startGame').textContent='Игра идёт…';
-gameTimer=setInterval(()=>{if(gameRunning&&Math.random()<.03)blocks.push({x:canvas.width,top:45+Math.random()*105})},100);
-flap();tick()
+
+function tone(startFrequency, endFrequency, duration, type = 'sine', volume = 0.035) {
+  if (!soundEnabled || !audioContext) return;
+  const oscillator = audioContext.createOscillator();
+  const gain = audioContext.createGain();
+  const now = audioContext.currentTime;
+  oscillator.type = type;
+  oscillator.frequency.setValueAtTime(startFrequency, now);
+  oscillator.frequency.exponentialRampToValueAtTime(Math.max(60, endFrequency), now + duration);
+  gain.gain.setValueAtTime(volume, now);
+  gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+  oscillator.connect(gain).connect(audioContext.destination);
+  oscillator.start(now);
+  oscillator.stop(now + duration);
 }
-canvas.addEventListener('pointerdown',flap);
-document.addEventListener('keydown',e=>{if(e.code==='Space'){e.preventDefault();flap()}});
-drawGame();
-</script>
-</body>
-</html>
+
+function playFlapSound() { tone(360, 620, 0.11, 'triangle', 0.035); }
+function playScoreSound() {
+  tone(520, 760, 0.12, 'sine', 0.04);
+  window.setTimeout(() => tone(760, 980, 0.12, 'sine', 0.03), 70);
+}
+function playHitSound() { tone(220, 75, 0.28, 'sawtooth', 0.045); }
+function playWinSound() {
+  tone(520, 820, 0.16, 'sine', 0.04);
+  window.setTimeout(() => tone(700, 1100, 0.2, 'sine', 0.035), 100);
+}
+
+function setPlayerY(value) {
+  const maxY = Math.max(0, game.clientHeight - player.offsetHeight);
+  playerY = clamp(value, 0, maxY);
+  player.style.top = `${playerY}px`;
+}
+
+function setPipeX(pair, x) {
+  pair.forEach(pipe => { pipe.style.left = `${x}px`; });
+}
+
+function configureLevel() {
+  const config = levelConfigs[currentLevel];
+  levelLabel.textContent = config.label;
+  scoreLabel.textContent = `0 / ${pipePairs.length}`;
+  config.gaps.forEach((gap, index) => {
+    pipePairs[index][0].style.height = `${gap[0]}px`;
+    pipePairs[index][1].style.height = `${gap[1]}px`;
+  });
+}
+
+function resetGame() {
+  const width = game.clientWidth;
+  pipePairs.forEach((pair, index) => setPipeX(pair, width * (0.92 + index * 0.66)));
+  passed = new Set();
+  score = 0;
+  velocity = 0;
+  scoreLabel.textContent = `0 / ${pipePairs.length}`;
+  scoreLabel.classList.remove('score-pop');
+  setPlayerY(game.clientHeight * 0.42);
+  status.hidden = true;
+}
+
+function spawnSpark(symbol = '✦') {
+  const spark = document.createElement('span');
+  spark.className = 'spark';
+  spark.textContent = symbol;
+  spark.style.left = `${player.offsetLeft + player.offsetWidth / 2}px`;
+  spark.style.top = `${playerY + player.offsetHeight / 2}px`;
+  game.querySelector('.lane').appendChild(spark);
+  window.setTimeout(() => spark.remove(), 700);
+}
+
+function flap() {
+  if (!running) return;
+  ensureAudio();
+  velocity = levelConfigs[currentLevel].flap;
+  playFlapSound();
+  spawnSpark('✦');
+}
+
+function overlaps(first, second) {
+  return first.left < second.right && first.right > second.left && first.top < second.bottom && first.bottom > second.top;
+}
+
+function goToPersonalFinal() {
+  status.hidden = true;
+  show(2);
+  stage2.scrollIntoView({ behavior: 'auto', block: 'start' });
+}
+
+function finishGame(won) {
+  running = false;
+  cancelAnimationFrame(animationFrame);
+  game.classList.remove('playing');
+  game.classList.add(won ? 'success' : 'hit');
+  window.setTimeout(() => game.classList.remove('success', 'hit'), 500);
+  if (won) {
+    playWinSound();
+    if (currentLevel < levelConfigs.length - 1) {
+      statusTitle.textContent = `✨ Уровень ${currentLevel + 1} пройден`;
+      statusText.textContent = 'Следующий пролёт будет быстрее и чуть теснее.';
+      statusAction.textContent = 'Следующий уровень →';
+      statusAction.onclick = () => startGame(currentLevel + 1);
+      playButton.textContent = 'Следующий уровень';
+    } else {
+      statusTitle.textContent = '🎁 Все уровни пройдены';
+      statusText.textContent = 'Теперь добавим имя и место для личной подсказки.';
+      statusAction.textContent = 'Настроить финал →';
+      statusAction.onclick = goToPersonalFinal;
+      playButton.textContent = 'Настроить финал';
+    }
+  } else {
+    playHitSound();
+    statusTitle.textContent = '💥 Ой, задела!';
+    statusText.textContent = 'Столкновение засчитано. Нажми повтор и попробуй ещё раз.';
+    statusAction.textContent = 'Повторить уровень';
+    statusAction.onclick = () => startGame(currentLevel);
+    playButton.textContent = 'Повторить уровень';
+  }
+  status.hidden = false;
+}
+
+function startGame(levelIndex = currentLevel) {
+  currentLevel = levelIndex;
+  ensureAudio();
+  cancelAnimationFrame(animationFrame);
+  configureLevel();
+  resetGame();
+  running = true;
+  game.classList.remove('hit', 'success');
+  game.classList.add('playing');
+  velocity = -3.2;
+  playButton.textContent = `Игра идёт · уровень ${currentLevel + 1}`;
+  tone(260, 420, 0.1, 'triangle', 0.025);
+  animationFrame = requestAnimationFrame(tick);
+}
+
+function tick() {
+  if (!running) return;
+  const config = levelConfigs[currentLevel];
+  velocity += config.gravity;
+  setPlayerY(playerY + velocity);
+
+  if (playerY <= 0 || playerY + player.offsetHeight >= game.clientHeight - 2) {
+    finishGame(false);
+    return;
+  }
+
+  const playerRect = player.getBoundingClientRect();
+  pipePairs.forEach((pair, index) => {
+    const x = parseFloat(pair[0].style.left) - config.speed;
+    setPipeX(pair, x);
+    if (!passed.has(index) && x + pair[0].offsetWidth < player.offsetLeft) {
+      passed.add(index);
+      score += 1;
+      scoreLabel.textContent = `${score} / ${pipePairs.length}`;
+      scoreLabel.classList.remove('score-pop');
+      void scoreLabel.offsetWidth;
+      scoreLabel.classList.add('score-pop');
+      playScoreSound();
+      spawnSpark('♥');
+      if (score === pipePairs.length) finishGame(true);
+    }
+    if (running && pair.some(pipe => overlaps(playerRect, pipe.getBoundingClientRect()))) finishGame(false);
+  });
+
+  if (running) animationFrame = requestAnimationFrame(tick);
+}
+
+function fillFinal(choice) {
+  const chosenPlace = choice.firstChild.textContent.trim();
+  const name = recipientName.value.trim() || 'Для тебя';
+  const location = giftPlace.value.trim() || chosenPlace;
+  document.getElementById('recipientOut').textContent = name;
+  document.getElementById('placeOut').textContent = chosenPlace;
+  document.getElementById('giftPlaceOut').textContent = location;
+  document.getElementById('letterTitle').textContent = name;
+  document.getElementById('letterPlace').textContent = location;
+  show(3);
+  stage3.scrollIntoView({ behavior: 'auto', block: 'start' });
+}
+
+document.getElementById('start').onclick = () => {
+  show(1);
+  stage1.scrollIntoView({ behavior: 'auto', block: 'start' });
+};
+playButton.onclick = () => {
+  if (running) flap();
+  else startGame(currentLevel);
+};
+soundToggle.onclick = event => {
+  event.stopPropagation();
+  soundEnabled = !soundEnabled;
+  if (soundEnabled) {
+    ensureAudio();
+    tone(520, 700, 0.1, 'sine', 0.03);
+  }
+  soundToggle.textContent = soundEnabled ? '🔊' : '🔇';
+  soundToggle.setAttribute('aria-label', soundEnabled ? 'Выключить звук' : 'Включить звук');
+};
+game.addEventListener('pointerdown', event => {
+  if (event.target.closest('#soundToggle')) return;
+  if (!running) return;
+  event.preventDefault();
+  flap();
+});
+document.addEventListener('keydown', event => {
+  if (event.code !== 'Space') return;
+  event.preventDefault();
+  flap();
+});
+document.querySelectorAll('.choice').forEach(choice => {
+  choice.onclick = () => fillFinal(choice);
+});
+document.getElementById('restart').onclick = () => {
+  currentLevel = 0;
+  recipientName.value = '';
+  giftPlace.value = '';
+  show(0);
+  window.scrollTo({ top: 0, behavior: 'auto' });
+};
+
+document.getElementById('start').addEventListener('click', () => {
+  requestAnimationFrame(() => setPlayerY(game.clientHeight * 0.42));
+}, { once: true });
+show(0);
+</script></body></html>
